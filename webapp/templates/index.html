@@ -13,7 +13,7 @@
 </head>
 <body>
     <div class="CanvasContainer">
-        <canvas id="drawingCanvas" width="400" height="200"></canvas>
+        <canvas id="drawingCanvas" width="200" height="200" style="border: solid 2px"></canvas>
     </div>
 
     <div class="Toolbar">
@@ -79,10 +79,20 @@
         function saveCanvas() {
           // 找到预览的 <img> 元素标签
           var imageCopy = $("#savedImageCopy").get(0);
-          console.log(canvas.toDataURL());
           // 将画布内容在img元素中显示
           imageCopy.src = canvas.toDataURL();
+          var data = {'file':canvas.toDataURL()};
+          $.ajax({
+              type:'POST',
+              url:'/web/upload',
+              data: data,
+              success: function (response) {
+                    console.log(response)
+              }
+          })
         }
+
+
 
 </script>
 </body>
