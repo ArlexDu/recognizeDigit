@@ -2,3 +2,4 @@
 1 django
 2 numpy
 3 scipy
+4 pillow

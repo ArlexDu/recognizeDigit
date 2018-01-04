@@ -1,12 +1,20 @@
+import json
+import os
+from django.conf import settings
+import numpy as np
 class fnn_network(object):
 
     weights=[]
-    biais=[]
+    biases=[]
 
     @staticmethod
-    def setWieghts():
-        fnn_network.weights = [1,2,3]
+    def loadParams():
+        params = os.path.join(settings.TRAIN_ROOT,'fnn_network.json')
+        with open(params,'r') as load_file:
+            load_dict = json.load(load_file)
+        fnn_network.weights = [np.array(w) for w in load_dict['weights']]
+        fnn_network.biases = [np.array(b) for b in load_dict['biases']]
 
     @staticmethod
-    def getWieghts():
-        return fnn_network.weights
+    def getParams():
+        return fnn_network.weights,fnn_network.biases

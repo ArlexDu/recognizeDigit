@@ -10,7 +10,8 @@ import base64
 # Create your views here.
 
 def index(request):
-    print(fnn_network.getWieghts())
+    weights,biases  =fnn_network.getParams()
+    print(biases)
     return render(request,'index.html',{})
 
 def upload(request):
