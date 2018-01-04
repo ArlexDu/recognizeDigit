@@ -15,13 +15,15 @@ def process(image):
         heightlen = int(20.0 * widthlen/heightlen)
         widthlen = 20
 
-
     hstart = int((28 - heightlen) / 2)
     wstart = int((28 - widthlen) / 2)
 
     img_temp = img.crop(bbox).resize((widthlen, heightlen), Image.NEAREST)
     new_img = Image.new('L', (28,28), 255)
     new_img.paste(img_temp, (wstart, hstart),mask = img_temp)
+    # new_img.show()
     imgdata = list(new_img.getdata())
     img_array = np.array([(255.0 - x) / 255.0 for x in imgdata])
     return img_array
+
+# process('/Users/arlex/Documents/Project/Webapp/recognizeDigit/media/1515083987348.png')
