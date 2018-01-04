@@ -2,9 +2,11 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.conf import settings
 from webapp.networks import fnn_network
+from webapp.process import *
 import os
 import time
 import base64
+
 # Create your views here.
 
 def index(request):
@@ -20,4 +22,5 @@ def upload(request):
     file = open(fileName,'wb')
     file.write(fileData)
     file.close()
+    array_picture = process(fileName)
     return HttpResponse(data)

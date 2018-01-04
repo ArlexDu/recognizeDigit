@@ -1,3 +1,4 @@
 .idea/*
 webapp/__pycache__/*
 training/__pycache__/*
+.vscode/*
