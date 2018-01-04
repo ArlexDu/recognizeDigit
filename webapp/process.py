@@ -1,9 +1,6 @@
 from PIL import Image
 import numpy as np
 def process(image):
-    # fileName1 = fileName+'.jpg'
-    # with open(fileName,'wb') as f:
-    #     f.write(fileName)
     img = Image.open(image)
     bbox = Image.eval(img,lambda px:255-px).getbbox()
     if bbox == None:
