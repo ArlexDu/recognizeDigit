@@ -1,12 +1,14 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.conf import settings
+from webapp.networks import fnn_network
 import os
 import time
 import base64
 # Create your views here.
 
 def index(request):
+    print(fnn_network.getWieghts())
     return render(request,'index.html',{})
 
 def upload(request):

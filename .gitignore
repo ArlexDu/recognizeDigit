@@ -1,1 +1,3 @@
 .idea/*
+webapp/__pycache__/*
+training/__pycache__/*
