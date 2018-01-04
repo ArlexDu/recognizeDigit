@@ -24,7 +24,7 @@ def process(image):
 
     img_temp = img.crop(bbox).resize((widthlen, heightlen), Image.NEAREST)
     new_img = Image.new('L', (28,28), 255)
-    new_img.paste(img_temp, (wstart, hstart))
+    new_img.paste(img_temp, (wstart, hstart),mask = img_temp)
     imgdata = list(new_img.getdata())
     img_array = np.array([(255.0 - x) / 255.0 for x in imgdata])
     return img_array
