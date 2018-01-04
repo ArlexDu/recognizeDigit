@@ -6,12 +6,11 @@ from webapp.process import *
 import os
 import time
 import base64
+import numpy as np
 
 # Create your views here.
 
 def index(request):
-    weights,biases  =fnn_network.getParams()
-    print(biases)
     return render(request,'index.html',{})
 
 def upload(request):
@@ -24,4 +23,7 @@ def upload(request):
     file.write(fileData)
     file.close()
     array_picture = process(fileName)
-    return HttpResponse(data)
+    result = np.argmax(fnn_network.feedforward(array_picture))
+    print('result is ')
+    print(result)
+    return HttpResponse(result)

@@ -76,7 +76,7 @@
               var data = {'file':canvas.toDataURL()};
               $.ajax({
                   type:'POST',
-                  url:'/web/upload',
+                  url:'/upload',
                   data: data,
                   success: function (response) {
                         console.log(response)
