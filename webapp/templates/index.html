@@ -2,21 +2,47 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Draw</title>
+        <title>手写数字识别</title>
         <script src="/static/jquery-3.2.1.min.js"></script>
         <style type="text/css">
-
+            html {
+                height: 100%;
+            }
+            .CanvasContainer{
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+            }
+            .Toolbar{
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+            }
+            .result{
+                width: 100%;
+                text-align: center;
+                color: black;
+                font-family: "Microsoft YaHei UI";
+                font-size: 30px;
+            }
         </style>
     </head>
-    <body>
+    <body style="height: 100%">
+        <br>
         <div class="CanvasContainer">
-            <canvas id="drawingCanvas" width="200" height="200" style="border: solid 2px"></canvas>
+            <canvas id="drawingCanvas" width="500" height="200" style="border: solid 2px"></canvas>
         </div>
-
+        <br>
         <div class="Toolbar">
-        - 操作 -<br>
-        <button onclick="saveCanvas()">保存图像</button>
-        <button onclick="clearCanvas()">清除图像</button>
+            <button onclick="saveCanvas()">识别数字</button>
+            <button onclick="clearCanvas()" style="margin-left: 50px">清除数字</button>
+        </div>
+        <br>
+        <div class="result"></div>
         <script type="application/javascript">
 
             var canvas;
@@ -79,7 +105,7 @@
                   url:'/upload',
                   data: data,
                   success: function (response) {
-                        console.log(response)
+                        $(".result").text("预测结果:"+response)
                   }
               })
             }
