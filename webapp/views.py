@@ -22,8 +22,9 @@ def upload(request):
     file = open(fileName,'wb')
     file.write(fileData)
     file.close()
-    array_picture = process(fileName)
-    result = np.argmax(fnn_network.feedforward(array_picture))
-    print('result is ')
-    print(result)
-    return HttpResponse(result)
+    array_pictures = process(fileName)
+    results = []
+    for pic in array_pictures:
+        result = np.argmax(fnn_network.feedforward(pic))
+        results.append(result)
+    return HttpResponse(results)
