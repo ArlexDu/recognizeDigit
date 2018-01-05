@@ -1,9 +1,11 @@
-"""network2.py
+"""network1.py
 ~~~~~~~~~~~~~~
-implementing the stochastic gradient descent learning algorithm for a 
-feedforward neural network.Improvements include the addition of the 
-cross-entropy cost function,loglikeCost function, regularization, and 
-better initialization of network weights and softmax.
+
+implementing the stochastic gradient descent learning algorithm for a
+feedforward neural network. Improvements include the addition of the 
+cross-entropy cost function,regularization, and better initialization 
+of network weights. 
+
 """
 
 #### Libraries
@@ -17,22 +19,6 @@ import numpy as np
 
 
 #### Define the quadratic and cross-entropy cost functions
-
-class LogLikeCost(object):
-
-    @staticmethod
-    def fn(a, y):
-        """Return the cost associated with an output ``a`` and desired output
-        ``y``.
-
-        """
-        return np.sum(np.nan_to_num(-y*np.log(a)))
-
-    @staticmethod
-    def delta(z, a, y):
-        """Return the error delta from the output layer."""
-        return (a-y)
-
 
 class CrossEntropyCost(object):
 
@@ -76,7 +62,7 @@ class Network(object):
         self.num_layers = len(sizes)
         self.sizes = sizes
         self.default_weight_initializer()
-        self.cost= CrossEntropyCost
+        self.cost=CrossEntropyCost
 
     def default_weight_initializer(self):
         """Initialize each weight using a Gaussian distribution with mean 0
@@ -117,11 +103,8 @@ class Network(object):
 
     def feedforward(self, a):
         """Return the output of the network if ``a`` is input."""
-        for b, w in zip(self.biases[:-1], self.weights[:-1]):
+        for b, w in zip(self.biases, self.weights):
             a = sigmoid(np.dot(w, a)+b)
-        b = self.biases[-1]
-        w = self.weights[-1]
-        a = softmax(np.dot(w, a) + b)
         return a
 
     def SGD(self, training_data, epochs, mini_batch_size, eta,
@@ -179,22 +162,22 @@ class Network(object):
 
             print("Epoch %s training complete" % j)
 
-            # if monitor_training_cost:
-            #     cost = self.total_cost(training_data, lmbda)
-            #     training_cost.append(cost)
-            #     print("Cost on training data: {}".format(cost))
+            if monitor_training_cost:
+                cost = self.total_cost(training_data, lmbda)
+                training_cost.append(cost)
+                print("Cost on training data: {}".format(cost))
             if monitor_training_accuracy:
                 accuracy = self.accuracy(training_data, convert=True)
                 training_accuracy.append(accuracy)
                 print("Accuracy on training data: %f" % (accuracy/n))
-            # if monitor_evaluation_cost:
-            #     cost = self.total_cost(evaluation_data, lmbda, convert=True)
-            #     evaluation_cost.append(cost)
-            #     print("Cost on evaluation data: {}".format(cost))
-            # if monitor_evaluation_accuracy:
-            #     accuracy = self.accuracy(evaluation_data)
-            #     evaluation_accuracy.append(accuracy)
-            #     print("Accuracy on evaluation data: %f" % (accuracy/n_data))
+            if monitor_evaluation_cost:
+                cost = self.total_cost(evaluation_data, lmbda, convert=True)
+                evaluation_cost.append(cost)
+                print("Cost on evaluation data: {}".format(cost))
+            if monitor_evaluation_accuracy:
+                accuracy = self.accuracy(evaluation_data)
+                evaluation_accuracy.append(accuracy)
+                print("Accuracy on evaluation data: %f" % (accuracy/n_data))
 
             # Early stopping:
             if early_stopping_n > 0:
@@ -242,19 +225,13 @@ class Network(object):
         activation = x
         activations = [x] # list to store all the activations, layer by layer
         zs = [] # list to store all the z vectors, layer by layer
-        for b, w in zip(self.biases[:-1], self.weights[:-1]):
+        for b, w in zip(self.biases, self.weights):
             z = np.dot(w, activation)+b
             zs.append(z)
             activation = sigmoid(z)
             activations.append(activation)
-        w = self.weights[-1]
-        b = self.biases[-1]
-        z = np.dot(w, activation) + b
-        zs.append(z)
-        activation = softmax(z)
-        activations.append(activation)
         # backward pass
-        delta = LogLikeCost.delta(zs[-1], activations[-1], y)
+        delta = (self.cost).delta(zs[-1], activations[-1], y)
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, activations[-2].transpose())
         # Note that the variable l in the loop below is used a little
@@ -329,6 +306,21 @@ class Network(object):
         json.dump(data, f)
         f.close()
 
+#### Loading a Network
+def load(filename):
+    """Load a neural network from the file ``filename``.  Returns an
+    instance of Network.
+
+    """
+    f = open(filename, "r")
+    data = json.load(f)
+    f.close()
+    cost = getattr(sys.modules[__name__], data["cost"])
+    net = Network(data["sizes"], cost=cost)
+    net.weights = [np.array(w) for w in data["weights"]]
+    net.biases = [np.array(b) for b in data["biases"]]
+    return net
+
 #### Miscellaneous functions
 def vectorized_result(j):
     """Return a 10-dimensional unit vector with a 1.0 in the j'th position
@@ -347,11 +339,3 @@ def sigmoid(z):
 def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
-
-def softmax(z):
-    """The softmax function."""
-    return np.exp(z)/np.sum(np.exp(z))
-
-def softmax_prime(z):
-    """Derivative of the softmax function."""
-    return softmax(z)*(1-softmax(z))

@@ -24,14 +24,22 @@ class fnn_network(object):
         """Return the output of the network if ``a`` is input."""
         # print('data shape is %s' % data.shape)
         data = np.reshape(data,(784,1))
-        for b, w in zip(fnn_network.biases, fnn_network.weights):
+        for b, w in zip(fnn_network.biases[:-1], fnn_network.weights[:-1]):
             # print('biases shape is %s,%s' % b.shape)
             # print('weight shape is %s,%s' % w.shape)
             # print('data shape is %s,%s' % data.shape)
             data = fnn_network.sigmoid(np.dot(w, data) + b)
+        b = fnn_network.biases[-1]
+        w = fnn_network.weights[-1]
+        data = fnn_network.softmax(np.dot(w, data) + b)
         return data
 
     @staticmethod
     def sigmoid(z):
         """The sigmoid function."""
         return 1.0 / (1.0 + np.exp(-z))
+
+    @staticmethod
+    def softmax(z):
+        """The softmax function."""
+        return np.exp(z) / np.sum(np.exp(z))
