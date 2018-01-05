@@ -2,7 +2,7 @@
 ~~~~~~~~~~~~~~
 implementing the stochastic gradient descent learning algorithm for a 
 feedforward neural network.Improvements include the addition of the 
-cross-entropy cost function,loglikeCost function, regularization, and 
+cross-entropy cost function,log-likelihood cost function, regularization, and 
 better initialization of network weights and softmax.
 """
 
