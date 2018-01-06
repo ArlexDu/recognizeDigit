@@ -4,7 +4,7 @@
 3. activate python35:进入改环境
 4. 使用pip 安装所需要python包 numpy scipy pillow django parameterized
 5. 使用conda安装theano库及其依赖 conda install numpy scipy mkl-service libpython theano pygpu 详见:http://deeplearning.net/software/theano/install_windows.html
-6. 进入项目根目录下执行 python manage.py runserver启动项目
+6. 进入项目根目录下执行 python manage.py runserver 0.0.0.0:8000启动项目
 7. 注：如果电脑上没有g++则需要安装g++
 
 ### python包的版本注明
