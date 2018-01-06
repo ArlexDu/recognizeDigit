@@ -80,7 +80,7 @@ def load_data_shared(filename="mnist.pkl.gz"):
 #### Main class used to construct and train networks
 class Network(object):
 
-    def __init__(self, layers, mini_batch_size):
+    def __init__(self, layers, mini_batch_size,params=None):
         """Takes a list of `layers`, describing the network architecture, and
         a value for the `mini_batch_size` to be used during training
         by stochastic gradient descent.
@@ -88,7 +88,8 @@ class Network(object):
         """
         self.layers = layers
         self.mini_batch_size = mini_batch_size
-        self.load()
+        if params != None:
+            self.load(params)
         self.params = [param for layer in self.layers for param in layer.params]
         self.x = T.matrix("x")
         self.y = T.ivector("y")
@@ -196,18 +197,18 @@ class Network(object):
         json.dump(data, f)
         f.close()
 
-    def predict(self,test_data):
-        test_x, test_y = test_data
-        data = test_x.get_value()[0:1]
-        print(data.shape)
+    def predict(self,data):
+        #test_x, test_y = data
+        #data = test_x.get_value()[0:1]
+        data = np.reshape(data,(1,784))
+        #print(data.shape)
         test_mb_predictions = theano.function(
             [self.x], self.layers[-1].y_out)
         y = test_mb_predictions(data)
-        print(y)
+        return y
 
-    def load(self):
-        params = '/Users/arlex/Documents/Project/Webapp/recognizeDigit/train/cnn_network.json'
-        with open(params, 'r') as load_file:
+    def load(self,file):
+        with open(file, 'r') as load_file:
             load_dict = json.load(load_file)
         param = [np.array(w) for w in load_dict['conv1_w']]
         self.layers[0].w.set_value(param)

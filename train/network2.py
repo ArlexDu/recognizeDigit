@@ -62,7 +62,7 @@ class CrossEntropyCost(object):
 #### Main Network class
 class Network(object):
 
-    def __init__(self, sizes):
+    def __init__(self, sizes,file=None):
         """The list ``sizes`` contains the number of neurons in the respective
         layers of the network.  For example, if the list was [2, 3, 1]
         then it would be a three-layer network, with the first layer
@@ -75,7 +75,10 @@ class Network(object):
         """
         self.num_layers = len(sizes)
         self.sizes = sizes
-        self.default_weight_initializer()
+        if file!=None:
+            self.loadParams(file)
+        else:
+            self.default_weight_initializer()
         self.cost= CrossEntropyCost
 
     def default_weight_initializer(self):
@@ -329,6 +332,15 @@ class Network(object):
         json.dump(data, f)
         f.close()
 
+    def loadParams(self,file):
+        with open(file, 'r') as load_file:
+            load_dict = json.load(load_file)
+        self.weights = [np.array(w) for w in load_dict['weights']]
+        self.biases = [np.array(b) for b in load_dict['biases']]
+
+    def predict(self,data):
+        data = np.reshape(data, (784, 1))
+        return self.feedforward(data)
 #### Miscellaneous functions
 def vectorized_result(j):
     """Return a 10-dimensional unit vector with a 1.0 in the j'th position

@@ -1,17 +1,19 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.conf import settings
-from webapp.networks import fnn_network,cnn_network,ConvPoolLayer, FullyConnectedLayer, SoftmaxLayer,ReLU
 from webapp.process import *
 import os
+import json
 import time
 import base64
 import numpy as np
+import train.network2
+import train.network3
+from train.network3 import ConvPoolLayer, FullyConnectedLayer, SoftmaxLayer,ReLU
 
-# Create your views here.
 mini_batch_size = 1
-
-cnn = cnn_network([
+load_cnn ='F:\\Projects\\Python\\recognizeDigit\\train\\cnn_network.json'
+cnn = train.network3.Network([
     ConvPoolLayer(image_shape=(mini_batch_size, 1, 28, 28),
                   filter_shape=(20, 1, 5, 5),
                   poolsize=(2, 2),
@@ -21,7 +23,9 @@ cnn = cnn_network([
                   poolsize=(2, 2),
                   activation_fn=ReLU),
     FullyConnectedLayer(n_in=40*4*4, n_out=100, activation_fn=ReLU),
-    SoftmaxLayer(n_in=100, n_out=10)], mini_batch_size)
+    SoftmaxLayer(n_in=100, n_out=10)], mini_batch_size,load_cnn)
+load_fnn = 'F:\\Projects\\Python\\recognizeDigit\\train\\fnn_network.json'
+fnn = train.network2.Network([784,40,10],load_fnn)
 
 def index(request):
     return render(request,'index.html',{})
@@ -36,11 +40,15 @@ def upload(request):
     file.write(fileData)
     file.close()
     array_pictures = process(fileName)
-    results = []
+    result_fnn = 0
+    result_cnn = 0
     for pic in array_pictures:
-        # result_array = fnn_network.feedforward(pic)
-        result_array = cnn.predict(pic)
+        rfnn = np.argmax(fnn.predict(pic))
+        rcnn = cnn.predict(pic)[0]
         # print(result_array)
-        result = np.argmax(result_array)
-        results.append(result)
-    return HttpResponse(results)
+        #result = np.argmax(result_array)
+        result_fnn = result_fnn*10+rfnn
+        result_cnn = result_cnn*10+rcnn
+    result = {'fnn':str(result_fnn),"cnn":str(result_cnn)}
+    #print(result)
+    return HttpResponse(json.dumps(result))
