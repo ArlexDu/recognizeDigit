@@ -4,112 +4,32 @@
         <meta charset="UTF-8">
         <title>手写数字识别</title>
         <script src="/static/jquery-3.2.1.min.js"></script>
-        <style type="text/css">
-            html {
-                height: 100%;
-            }
-            .CanvasContainer{
-                width: 100%;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: center;
-            }
-            .Toolbar{
-                width: 100%;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: center;
-            }
-            .result{
-                width: 100%;
-                text-align: center;
-                color: black;
-                font-family: "Microsoft YaHei UI";
-                font-size: 30px;
-            }
-        </style>
+        <link href="/static/main.css" rel="stylesheet">
     </head>
     <body style="height: 100%">
+        <br>
+        <div class="title">手写数字识别</div>
         <br>
         <div class="CanvasContainer">
             <canvas id="drawingCanvas" width="500" height="200" style="border: solid 2px"></canvas>
         </div>
         <br>
         <div class="Toolbar">
-            <button onclick="saveCanvas()">识别数字</button>
-            <button onclick="clearCanvas()" style="margin-left: 50px">清除数字</button>
+            <div class="button blue" onclick="saveCanvas()">识别数字</div>
+            <div class="button blue" onclick="clearCanvas()" style="margin-left: 50px">清除数字</div>
         </div>
-        <br>
-        <div class="result"></div>
-        <script type="application/javascript">
-
-            var canvas;
-            var context;
-            // 记录当前是否在画图
-            var isDrawing = false;
-
-            $(function () {
-                //获取画布与绘图上下文
-                canvas = $("#drawingCanvas").get(0);
-
-                context = canvas.getContext('2d');
-                context.strokeStyle = 'rgb(0,0,0)';
-                context.lineWidth = 15;
-
-                //画布添加鼠标事件
-                canvas.onmousedown = startDrawing;
-                canvas.onmouseup = stopDrawing;
-                canvas.onmouseout = stopDrawing;
-                canvas.onmousemove = draw;
-            })
-
-
-            //开始画图
-            function startDrawing(e) {
-                isDrawing = true;
-                //创建一个新的绘图路径
-                context.beginPath();
-                //把画笔移动到鼠标的位置
-                context.moveTo(e.pageX-canvas.offsetLeft, e.pageY - canvas.offsetTop);
-            }
-
-            // 停止画图
-            function stopDrawing(e) {
-                isDrawing = false;
-            }
-
-           //画图中
-            function draw(e) {
-              if (isDrawing == true) {
-                // 找到鼠标最新位置
-                var x = e.pageX - canvas.offsetLeft;
-                var y = e.pageY - canvas.offsetTop;
-                // 画一条直线到鼠标最新位置
-                context.lineTo(x, y);
-                context.stroke();
-              }
-            }
-
-            // 清除画布
-            function clearCanvas() {
-              context.clearRect(0, 0, canvas.width, canvas.height);
-            }
-
-            // 保存画布
-            function saveCanvas() {
-              var data = {'file':canvas.toDataURL()};
-              $.ajax({
-                  type:'POST',
-                  url:'/upload',
-                  data: data,
-                  success: function (response) {
-                        $(".result").text("预测结果:"+response)
-                  }
-              })
-            }
-
-        </script>
+        <div class="spinner">
+          <div class="rect1"></div>
+          <div class="rect2"></div>
+          <div class="rect3"></div>
+          <div class="rect4"></div>
+          <div class="rect5"></div>
+        </div>
+        <div class="result">
+            <div id="fnn"></div>
+            <br>
+            <div id="cnn"></div>
+        </div>
+        <script src="/static/main.js" type="application/javascript"> </script>
     </body>
 </html>

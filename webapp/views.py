@@ -44,7 +44,7 @@ def upload(request):
     result_cnn = []
     for pic in array_pictures:
         rfnn = np.argmax(fnn.predict(pic))
-        # rcnn = cnn.predict(pic)[0]
+        rcnn = cnn.predict(pic)[0]
         # print(result_array)
         #result = np.argmax(result_array)
         result_fnn.append(rfnn)
