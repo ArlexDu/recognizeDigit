@@ -40,15 +40,20 @@ def upload(request):
     file.write(fileData)
     file.close()
     array_pictures = process(fileName)
-    result_fnn = 0
-    result_cnn = 0
+    result_fnn = []
+    result_cnn = []
     for pic in array_pictures:
         rfnn = np.argmax(fnn.predict(pic))
         # rcnn = cnn.predict(pic)[0]
         # print(result_array)
         #result = np.argmax(result_array)
-        result_fnn = result_fnn*10+rfnn
-        result_cnn = result_cnn*10+rcnn
-    result = {'fnn':str(result_fnn),"cnn":str(result_cnn)}
+        result_fnn.append(rfnn)
+        result_cnn.append(rcnn)
+    rfnn = ''
+    rcnn = ''
+    for f,c in zip(result_fnn,result_cnn):
+        rfnn = rfnn + str(f)
+        rcnn = rcnn + str(c)
+    result = {'fnn':rfnn,"cnn":rcnn}
     #print(result)
     return HttpResponse(json.dumps(result))
