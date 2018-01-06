@@ -12,7 +12,7 @@ import train.network3
 from train.network3 import ConvPoolLayer, FullyConnectedLayer, SoftmaxLayer,ReLU
 
 mini_batch_size = 1
-load_cnn ='F:\\Projects\\Python\\recognizeDigit\\train\\cnn_network.json'
+load_cnn = os.path.join(settings.TRAIN_ROOT,'cnn_network.json')
 cnn = train.network3.Network([
     ConvPoolLayer(image_shape=(mini_batch_size, 1, 28, 28),
                   filter_shape=(20, 1, 5, 5),
@@ -24,7 +24,7 @@ cnn = train.network3.Network([
                   activation_fn=ReLU),
     FullyConnectedLayer(n_in=40*4*4, n_out=100, activation_fn=ReLU),
     SoftmaxLayer(n_in=100, n_out=10)], mini_batch_size,load_cnn)
-load_fnn = 'F:\\Projects\\Python\\recognizeDigit\\train\\fnn_network.json'
+load_fnn = os.path.join(settings.TRAIN_ROOT,'fnn_network.json')
 fnn = train.network2.Network([784,40,10],load_fnn)
 
 def index(request):
@@ -44,7 +44,7 @@ def upload(request):
     result_cnn = 0
     for pic in array_pictures:
         rfnn = np.argmax(fnn.predict(pic))
-        rcnn = cnn.predict(pic)[0]
+        # rcnn = cnn.predict(pic)[0]
         # print(result_array)
         #result = np.argmax(result_array)
         result_fnn = result_fnn*10+rfnn
