@@ -1,9 +1,5 @@
 """CNN.py
 ~~~~~~~~~~~~~~
-
-A Theano-based program for training and running simple neural
-networks.
-
 Supports several layer types (fully connected, convolutional, max
 pooling, softmax), and activation functions (sigmoid, tanh, and
 rectified linear units, with more easily added).
@@ -97,6 +93,22 @@ class Network(object):
                 self.y:
                 training_y[i*self.mini_batch_size: (i+1)*self.mini_batch_size]
             })
+        train_mb_accuracy = theano.function(
+            [i], self.layers[-1].accuracy(self.y),
+            givens={
+                self.x:
+                    training_x[i * self.mini_batch_size: (i + 1) * self.mini_batch_size],
+                self.y:
+                    training_y[i * self.mini_batch_size: (i + 1) * self.mini_batch_size]
+            })
+        validate_mb = theano.function(
+            [i], cost, updates=updates,
+            givens={
+                self.x:
+                    validation_x[i * self.mini_batch_size: (i + 1) * self.mini_batch_size],
+                self.y:
+                    validation_y[i * self.mini_batch_size: (i + 1) * self.mini_batch_size]
+            })
         validate_mb_accuracy = theano.function(
             [i], self.layers[-1].accuracy(self.y),
             givens={
@@ -121,6 +133,8 @@ class Network(object):
             })
         # Do the actual training
         best_validation_accuracy = 0.0
+        evaluation_costs, evaluation_accuracys = [], []
+        training_costs, training_accuracys = [], []
         for epoch in range(epochs):
             for minibatch_index in range(num_training_batches):
                 iteration = num_training_batches*epoch+minibatch_index
@@ -128,10 +142,18 @@ class Network(object):
                     print("Training mini-batch number {0}".format(iteration))
                 cost_ij = train_mb(minibatch_index)
                 if (iteration+1) % num_training_batches == 0:
+                    train_cost = np.mean([train_mb(j) for j in range(num_training_batches)])
+                    training_costs.append(cost_ij)
+                    training_accuracy = np.mean(
+                        [train_mb_accuracy(j) for j in range(num_training_batches)])
+                    training_accuracys.append(training_accuracy)
+                    validation_cost = np.mean([validate_mb(j) for j in range(num_validation_batches)])
+                    evaluation_costs.append(validation_cost)
                     validation_accuracy = np.mean(
                         [validate_mb_accuracy(j) for j in range(num_validation_batches)])
                     print("Epoch {0}: validation accuracy {1:.2%}".format(
                         epoch, validation_accuracy))
+                    evaluation_accuracys.append(validation_accuracy)
                     if validation_accuracy >= best_validation_accuracy:
                         print("This is the best validation accuracy to date.")
                         best_validation_accuracy = validation_accuracy
@@ -145,6 +167,7 @@ class Network(object):
         print("Best validation accuracy of {0:.2%} obtained at iteration {1}".format(
             best_validation_accuracy, best_iteration))
         print("Corresponding test accuracy of {0:.2%}".format(test_accuracy))
+        return evaluation_costs, evaluation_accuracys, training_costs, training_accuracys
 
     def save(self, filename):
         """Save the neural network to the file ``filename``."""

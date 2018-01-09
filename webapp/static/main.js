@@ -51,6 +51,7 @@ function draw(e) {
 // 清除画布
 function clearCanvas() {
   context.clearRect(0, 0, canvas.width, canvas.height);
+  $(".result").hide();
 }
 
 // 保存画布

@@ -115,7 +115,7 @@ class Network(object):
             # the training set accuracy
             if monitor_training_accuracy:
                 accuracy = self.accuracy(training_data, convert=True)
-                training_accuracy.append(accuracy)
+                training_accuracy.append(accuracy/n)
                 print("Accuracy on training data: %f" % (accuracy/n))
             # the evaluation set cost
             if monitor_evaluation_cost:
@@ -125,7 +125,7 @@ class Network(object):
             # the evaluation set accuracy
             if monitor_evaluation_accuracy:
                 accuracy = self.accuracy(evaluation_data)
-                evaluation_accuracy.append(accuracy)
+                evaluation_accuracy.append(accuracy/n_data)
                 print("Accuracy on evaluation data: %f" % (accuracy/n_data))
 
             # Early stopping:
@@ -141,8 +141,7 @@ class Network(object):
                     print("Early-stopping: No accuracy change in last epochs: {}".format(early_stopping_n))
                     return evaluation_cost, evaluation_accuracy, training_cost, training_accuracy
 
-        return evaluation_cost, evaluation_accuracy, \
-            training_cost, training_accuracy
+        return evaluation_cost, evaluation_accuracy,training_cost, training_accuracy
 
     def update_mini_batch(self, mini_batch, eta, lmbda, n):
         # Update the network's weights and biases by applying gradient
@@ -198,28 +197,6 @@ class Network(object):
         return (nabla_b, nabla_w)
 
     def accuracy(self, data, convert=False):
-        """Return the number of inputs in ``data`` for which the neural
-        network outputs the correct result. The neural network's
-        output is assumed to be the index of whichever neuron in the
-        final layer has the highest activation.
-
-        The flag ``convert`` should be set to False if the data set is
-        validation or test data (the usual case), and to True if the
-        data set is the training data. The need for this flag arises
-        due to differences in the way the results ``y`` are
-        represented in the different data sets.  In particular, it
-        flags whether we need to convert between the different
-        representations.  It may seem strange to use different
-        representations for the different data sets.  Why not use the
-        same representation for all three data sets?  It's done for
-        efficiency reasons -- the program usually evaluates the cost
-        on the training data and the accuracy on other data sets.
-        These are different types of computations, and using different
-        representations speeds things up.  More details on the
-        representations can be found in
-        mnist_loader.load_data_wrapper.
-
-        """
         if convert:
             results = [(np.argmax(self.feedforward(x)), np.argmax(y))
                        for (x, y) in data]
@@ -231,12 +208,6 @@ class Network(object):
         return result_accuracy
 
     def total_cost(self, data, lmbda, convert=False):
-        """Return the total cost for the data set ``data``.  The flag
-        ``convert`` should be set to False if the data set is the
-        training data (the usual case), and to True if the data set is
-        the validation or test data.  See comments on the similar (but
-        reversed) convention for the ``accuracy`` method, above.
-        """
         cost = 0.0
         for x, y in data:
             a = self.feedforward(x)
