@@ -1,9 +1,8 @@
-import network3
-from network3 import Network
-from network3 import ConvPoolLayer, FullyConnectedLayer, SoftmaxLayer
+import CNN
+from CNN import Network
+from CNN import ConvPoolLayer, FullyConnectedLayer, SoftmaxLayerm,ReLU
 training_data, validation_data, test_data = network3.load_data_shared()
 mini_batch_size = 10
-from network3 import ReLU
 load_file ='F:\\Projects\\Python\\recognizeDigit\\train\\cnn_network.json'
 net = Network([
     ConvPoolLayer(image_shape=(mini_batch_size, 1, 28, 28),

@@ -7,13 +7,13 @@ import json
 import time
 import base64
 import numpy as np
-import train.network2
-import train.network3
-from train.network3 import ConvPoolLayer, FullyConnectedLayer, SoftmaxLayer,ReLU
+import train.FNN
+import train.CNN
+from train.CNN import ConvPoolLayer, FullyConnectedLayer, SoftmaxLayer,ReLU
 
 mini_batch_size = 1
 load_cnn = os.path.join(settings.TRAIN_ROOT,'cnn_network.json')
-cnn = train.network3.Network([
+cnn = train.CNN.Network([
     ConvPoolLayer(image_shape=(mini_batch_size, 1, 28, 28),
                   filter_shape=(20, 1, 5, 5),
                   poolsize=(2, 2),
@@ -25,7 +25,7 @@ cnn = train.network3.Network([
     FullyConnectedLayer(n_in=40*4*4, n_out=100, activation_fn=ReLU),
     SoftmaxLayer(n_in=100, n_out=10)], mini_batch_size,load_cnn)
 load_fnn = os.path.join(settings.TRAIN_ROOT,'fnn_network.json')
-fnn = train.network2.Network([784,40,10],load_fnn)
+fnn = train.FNN.Network([784, 40, 10], load_fnn)
 
 def index(request):
     return render(request,'index.html',{})

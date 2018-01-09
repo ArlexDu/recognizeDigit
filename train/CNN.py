@@ -1,4 +1,4 @@
-"""network3.py
+"""CNN.py
 ~~~~~~~~~~~~~~
 
 A Theano-based program for training and running simple neural
@@ -7,24 +7,6 @@ networks.
 Supports several layer types (fully connected, convolutional, max
 pooling, softmax), and activation functions (sigmoid, tanh, and
 rectified linear units, with more easily added).
-
-When run on a CPU, this program is much faster than network.py and
-network2.py.  However, unlike network.py and network2.py it can also
-be run on a GPU, which makes it faster still.
-
-Because the code is based on Theano, the code is different in many
-ways from network.py and network2.py.  However, where possible I have
-tried to maintain consistency with the earlier programs.  In
-particular, the API is similar to network2.py.  Note that I have
-focused on making the code simple, easily readable, and easily
-modifiable.  It is not optimized, and omits many desirable features.
-
-This program incorporates ideas from the Theano documentation on
-convolutional neural nets (notably,
-http://deeplearning.net/tutorial/lenet.html ), from Misha Denil's
-implementation of dropout (https://github.com/mdenil/dropout ), and
-from Chris Olah (http://colah.github.io ).
-
 """
 #### Libraries
 # Standard library
@@ -48,18 +30,6 @@ from theano.tensor.nnet import sigmoid
 from theano.tensor import tanh
 
 
-#### Constants
-# GPU = True
-# if GPU:
-#     print("Trying to run under a GPU.  If this is not desired, then modify "+\
-#         "network3.py\nto set the GPU flag to False.")
-#     try: theano.config.device = 'gpu'
-#     except: pass # it's already set
-#     theano.config.floatX = 'float32'
-# else:
-#     print("Running with a CPU.  If this is not desired, then the modify "+\
-#         "network3.py to set\nthe GPU flag to True.")
-
 #### Load the MNIST data
 def load_data_shared(filename="mnist.pkl.gz"):
     f = gzip.open(filename, 'rb')
@@ -68,7 +38,6 @@ def load_data_shared(filename="mnist.pkl.gz"):
     def shared(data):
         """Place the data into shared variables.  This allows Theano to copy
         the data to the GPU, if one is available.
-
         """
         shared_x = theano.shared(
             np.asarray(data[0], dtype=theano.config.floatX), borrow=True)
@@ -81,11 +50,7 @@ def load_data_shared(filename="mnist.pkl.gz"):
 class Network(object):
 
     def __init__(self, layers, mini_batch_size,params=None):
-        """Takes a list of `layers`, describing the network architecture, and
-        a value for the `mini_batch_size` to be used during training
-        by stochastic gradient descent.
 
-        """
         self.layers = layers
         self.mini_batch_size = mini_batch_size
         if params != None:
@@ -104,7 +69,7 @@ class Network(object):
 
     def SGD(self, training_data, epochs, mini_batch_size, eta,
             validation_data, test_data, lmbda=0.0):
-        """Train the network using mini-batch stochastic gradient descent."""
+        #Train the network using mini-batch stochastic gradient descent.
         training_x, training_y = training_data
         validation_x, validation_y = validation_data
         test_x, test_y = test_data
@@ -230,27 +195,11 @@ class Network(object):
 #### Define layer types
 
 class ConvPoolLayer(object):
-    """Used to create a combination of a convolutional and a max-pooling
-    layer.  A more sophisticated implementation would separate the
-    two, but for our purposes we'll always use them together, and it
-    simplifies the code, so it makes sense to combine them.
-
-    """
-
+    # Used to create a combination of a convolutional and a max-pooling
+    # layer
     def __init__(self, filter_shape, image_shape, poolsize=(2, 2),
                  activation_fn=sigmoid):
-        """`filter_shape` is a tuple of length 4, whose entries are the number
-        of filters, the number of input feature maps, the filter height, and the
-        filter width.
 
-        `image_shape` is a tuple of length 4, whose entries are the
-        mini-batch size, the number of input feature maps, the image
-        height, and the image width.
-
-        `poolsize` is a tuple of length 2, whose entries are the y and
-        x pooling sizes.
-
-        """
         self.filter_shape = filter_shape
         self.image_shape = image_shape
         self.poolsize = poolsize
