@@ -58,6 +58,7 @@ class Network(object):
             self.default_weight_initializer()
         self.cost= CrossEntropyCost
 
+    # initial weights with regularization
     def default_weight_initializer(self):
         # Initialize each weight using a Gaussian distribution with mean 0
         # and standard deviation 1
@@ -65,6 +66,7 @@ class Network(object):
         self.weights = [np.random.randn(y, x)/np.sqrt(x)
                         for x, y in zip(self.sizes[:-1], self.sizes[1:])]
 
+    # forward-propagating
     def feedforward(self, a):
         # Return the output of the network if `a` is input.
         for b, w in zip(self.biases[:-1], self.weights[:-1]):
@@ -74,6 +76,7 @@ class Network(object):
         a = softmax(np.dot(w, a) + b)
         return a
 
+    # training function
     def SGD(self, training_data, epochs, mini_batch_size, eta,
             lmbda = 0.0,
             evaluation_data=None,
@@ -178,16 +181,11 @@ class Network(object):
         zs.append(z)
         activation = softmax(z)
         activations.append(activation)
-        # backward pass
+        # get the last layer's error
         delta = LogLikeCost.delta(zs[-1], activations[-1], y)
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, activations[-2].transpose())
-        # Note that the variable l in the loop below is used a little
-        # differently to the notation in Chapter 2 of the book.  Here,
-        # l = 1 means the last layer of neurons, l = 2 is the
-        # second-last layer, and so on.  It's a renumbering of the
-        # scheme in the book, used here to take advantage of the fact
-        # that Python can use negative indices in lists.
+        # base on backprop formula
         for l in range(2, self.num_layers):
             z = zs[-l]
             sp = sigmoid_prime(z)
@@ -196,6 +194,7 @@ class Network(object):
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
         return (nabla_b, nabla_w)
 
+    # get the accuracy
     def accuracy(self, data, convert=False):
         if convert:
             results = [(np.argmax(self.feedforward(x)), np.argmax(y))
@@ -207,6 +206,7 @@ class Network(object):
         result_accuracy = sum(int(x == y) for (x, y) in results)
         return result_accuracy
 
+    # get the cost
     def total_cost(self, data, lmbda, convert=False):
         cost = 0.0
         for x, y in data:
@@ -216,6 +216,7 @@ class Network(object):
             # cost += 0.5*(lmbda/len(data))*sum(np.linalg.norm(w)**2 for w in self.weights) # '**' - to the power of.
         return cost
 
+    # save weights and biases
     def save(self, filename):
         """Save the neural network to the file ``filename``."""
         data = {"sizes": self.sizes,
@@ -226,12 +227,14 @@ class Network(object):
         json.dump(data, f)
         f.close()
 
+    # load weights and biases
     def loadParams(self,file):
         with open(file, 'r') as load_file:
             load_dict = json.load(load_file)
         self.weights = [np.array(w) for w in load_dict['weights']]
         self.biases = [np.array(b) for b in load_dict['biases']]
 
+    # predict a result
     def predict(self,data):
         data = np.reshape(data, (784, 1))
         return self.feedforward(data)

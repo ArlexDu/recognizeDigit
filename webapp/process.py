@@ -1,7 +1,8 @@
 from PIL import Image
 import numpy as np
+import math
 
-# 转化灰度图片
+# Convert mode of picture
 def convertGray(img,width,height):
     dest = Image.new('L', (width, height), 255)
     for i in range(width):
@@ -11,7 +12,8 @@ def convertGray(img,width,height):
             dest.putpixel((i,j),brightness)
     return dest
 
-# 获取分割的图片
+
+# Cut Image for separated number
 def getCutImage(img,data,width,height):
     data = np.reshape(data, (height, width))
     print(data.shape)
@@ -46,20 +48,8 @@ def getCutImage(img,data,width,height):
         h2s.append(h2)
     return w1s,w2s,h1s,h2s
 
-def process(image):
-    img = Image.open(image)
-    width, height = img.size
-    gray_img = convertGray(img, width, height)
-    data = np.matrix(gray_img.getdata())
-    w1s,w2s,h1s,h2s = getCutImage(gray_img, data, width, height)
-    arrays = []
-    for w1,w2,h1,h2 in zip(w1s,w2s,h1s,h2s):
-        a = data_process(img,w1,w2,h1,h2)
-        arrays.append(a)
-    return arrays
 
-
-# 处理函数
+# Convert picture into matrix
 def data_process(img,w1,w2,h1,h2):
     widthlen = w2 - w1
     heightlen = h2 - h1
@@ -77,10 +67,26 @@ def data_process(img,w1,w2,h1,h2):
     img_temp = img.crop((w1,h1,w2,h2)).resize((widthlen, heightlen), Image.NEAREST)
     new_img = Image.new('L', (28,28), 255)
     new_img.paste(img_temp, (wstart, hstart),mask = img_temp)
-    # new_img.show()
     imgdata = list(new_img.getdata())
-    img_array = np.array([(255.0 - x) / 255.0 for x in imgdata])
+    img_array = np.array([math.ceil((255.0 - x) / 255.0) for x in imgdata])
+    count = 0
+    for i in img_array:
+        print(i,end = ' ')
+        count +=1
+        if(count %28 ==0):
+            print(end = '\n')
     return img_array
 
-
+# edit photo to what we want
+def process(image):
+    img = Image.open(image)
+    width, height = img.size
+    gray_img = convertGray(img, width, height)
+    data = np.matrix(gray_img.getdata())
+    w1s,w2s,h1s,h2s = getCutImage(gray_img, data, width, height)
+    arrays = []
+    for w1,w2,h1,h2 in zip(w1s,w2s,h1s,h2s):
+        a = data_process(img,w1,w2,h1,h2)
+        arrays.append(a)
+    return arrays
 

@@ -1,13 +1,13 @@
-### 项目运行环境配置
-1. 安装Ancaonda,具体的Anaconda使用方法详见:https://www.jianshu.com/p/2f3be7781451
-2. 新建一个新的python3.5的虚拟环境 conda create --name python35 python=3.5
-3. activate python35:进入改环境
-4. 使用pip 安装所需要python包 numpy scipy pillow django parameterized
-5. 使用conda安装theano库及其依赖 conda install numpy scipy mkl-service libpython theano pygpu 详见:http://deeplearning.net/software/theano/install_windows.html
-6. 进入项目根目录下执行 python manage.py runserver 0.0.0.0:8000启动项目
-7. 注：如果电脑上没有g++则需要安装g++
+### Environment Configuration
+1. Install Ancaonda(Reference:https://www.jianshu.com/p/2f3be7781451)
+2. Create a virtual environment of python 3.5 by using conda.(conda create --name python35 python=3.5)
+3. Using command  “activate python35 “ to activate environment.
+4. Install numpy、scipy、pillow、django、parameterized into virtual environment via pip or conda(pip/conda install <package name>.
+5. Install theano and its dependencies via conda(conda install theano, Reference: :http://deeplearning.net/software/theano/install_windows.html)
+6. Entering in root directory of program, use “python manage.py runserver 0.0.0.0:8000“ to set up program ,and then open“localhost:8000” in your brower
+7. You need make sure you have g++(Windows/Linux) or Clang(OS X) installed.
 
-### python包的版本注明
+### python packages
 #### pip list
 ```
 certifi (2017.11.5)

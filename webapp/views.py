@@ -30,8 +30,10 @@ fnn = train.FNN.Network([784, 40, 10], load_fnn)
 def index(request):
     return render(request,'index.html',{})
 
+# predict function
 def upload(request):
     data = request.POST.get('file')
+    # save data as a picture
     path = settings.MEDIA_ROOT
     type = data.split(';')[0].split('/')[1]
     fileName = os.path.join(path,str(int(time.time()*1000))+'.'+type)
@@ -39,9 +41,11 @@ def upload(request):
     file = open(fileName,'wb')
     file.write(fileData)
     file.close()
+    # split picture into single digit picture
     array_pictures = process(fileName)
     result_fnn = []
     result_cnn = []
+    # predict digit from pictures
     for pic in array_pictures:
         rfnn = np.argmax(fnn.predict(pic))
         rcnn = cnn.predict(pic)[0]

@@ -32,9 +32,8 @@ def load_data_shared(filename="mnist.pkl.gz"):
     training_data, validation_data, test_data = pickle.load(f, encoding="latin1")
     f.close()
     def shared(data):
-        """Place the data into shared variables.  This allows Theano to copy
-        the data to the GPU, if one is available.
-        """
+        #Place the data into shared variables.  This allows Theano to copy
+        #the data to the GPU, if one is available.
         shared_x = theano.shared(
             np.asarray(data[0], dtype=theano.config.floatX), borrow=True)
         shared_y = theano.shared(
@@ -52,6 +51,7 @@ class Network(object):
         if params != None:
             self.load(params)
         self.params = [param for layer in self.layers for param in layer.params]
+        # x y place holder
         self.x = T.matrix("x")
         self.y = T.ivector("y")
         init_layer = self.layers[0]
@@ -85,6 +85,7 @@ class Network(object):
         # define functions to train a mini-batch, and to compute the
         # accuracy in validation and test mini-batches.
         i = T.lscalar() # mini-batch index
+        # get the cost from train set
         train_mb = theano.function(
             [i], cost, updates=updates,
             givens={
@@ -93,6 +94,7 @@ class Network(object):
                 self.y:
                 training_y[i*self.mini_batch_size: (i+1)*self.mini_batch_size]
             })
+        # get the accuracy from train set
         train_mb_accuracy = theano.function(
             [i], self.layers[-1].accuracy(self.y),
             givens={
@@ -101,6 +103,7 @@ class Network(object):
                 self.y:
                     training_y[i * self.mini_batch_size: (i + 1) * self.mini_batch_size]
             })
+        # get the cost from validate set
         validate_mb = theano.function(
             [i], cost, updates=updates,
             givens={
@@ -109,6 +112,7 @@ class Network(object):
                 self.y:
                     validation_y[i * self.mini_batch_size: (i + 1) * self.mini_batch_size]
             })
+        # get the accuracy from validate set
         validate_mb_accuracy = theano.function(
             [i], self.layers[-1].accuracy(self.y),
             givens={
@@ -117,6 +121,7 @@ class Network(object):
                 self.y:
                 validation_y[i*self.mini_batch_size: (i+1)*self.mini_batch_size]
             })
+        # get the accuracy from test set
         test_mb_accuracy = theano.function(
             [i], self.layers[-1].accuracy(self.y),
             givens={
@@ -125,13 +130,14 @@ class Network(object):
                 self.y:
                 test_y[i*self.mini_batch_size: (i+1)*self.mini_batch_size]
             })
+        # predict result
         self.test_mb_predictions = theano.function(
             [i], self.layers[-1].y_out,
             givens={
                 self.x:
                 test_x[i*self.mini_batch_size: (i+1)*self.mini_batch_size]
             })
-        # Do the actual training
+        # Do the actual training process
         best_validation_accuracy = 0.0
         evaluation_costs, evaluation_accuracys = [], []
         training_costs, training_accuracys = [], []
@@ -170,8 +176,7 @@ class Network(object):
         return evaluation_costs, evaluation_accuracys, training_costs, training_accuracys
 
     def save(self, filename):
-        """Save the neural network to the file ``filename``."""
-
+        #Save the neural network to the file ``filename``
         data = {"conv1_w": [w.tolist() for w in self.params[0].get_value()],
                 "conv1_b": [w.tolist() for w in self.params[1].get_value()],
                 "conv2_w": [w.tolist() for w in self.params[2].get_value()],
@@ -185,6 +190,7 @@ class Network(object):
         json.dump(data, f)
         f.close()
 
+    # predict a result form a single picture
     def predict(self,data):
         #test_x, test_y = data
         #data = test_x.get_value()[0:1]
@@ -195,6 +201,7 @@ class Network(object):
         y = test_mb_predictions(data)
         return y
 
+    # load weights and biases
     def load(self,file):
         with open(file, 'r') as load_file:
             load_dict = json.load(load_file)
@@ -216,7 +223,6 @@ class Network(object):
         self.layers[3].b.set_value(param)
 
 #### Define layer types
-
 class ConvPoolLayer(object):
     # Used to create a combination of a convolutional and a max-pooling
     # layer
@@ -322,6 +328,7 @@ def size(data):
     "Return the size of the dataset `data`."
     return data[0].get_value(borrow=True).shape[0]
 
+# initial a dropout layer
 def dropout_layer(layer, p_dropout):
     srng = shared_randomstreams.RandomStreams(
         np.random.RandomState(0).randint(999999))
